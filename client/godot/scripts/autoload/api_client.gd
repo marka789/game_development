@@ -17,22 +17,26 @@ func is_logged_in() -> bool:
 	return token != ""
 
 
-func _headers() -> PackedStringArray:
-	return PackedStringArray([
-		"Content-Type: application/json",
-		"Authorization: Bearer %s" % token,
-	])
+func _build_headers(include_json: bool) -> PackedStringArray:
+	var headers := PackedStringArray()
+	if include_json:
+		headers.append("Content-Type: application/json")
+	if token != "":
+		headers.append("Authorization: Bearer %s" % token)
+	return headers
 
 
 func _request(method: int, path: String, body: Dictionary = {}) -> Dictionary:
 	var http := HTTPRequest.new()
 	add_child(http)
 
+	var sends_json := method == HTTPClient.METHOD_POST or method == HTTPClient.METHOD_PUT or method == HTTPClient.METHOD_PATCH
 	var json_body := ""
-	if not body.is_empty():
+	if sends_json:
+		# Fastify rejects Content-Type: application/json with an empty body.
 		json_body = JSON.stringify(body)
 
-	var err := http.request("%s%s" % [api_url, path], _headers(), method, json_body)
+	var err := http.request("%s%s" % [api_url, path], _build_headers(sends_json), method, json_body)
 	if err != OK:
 		http.queue_free()
 		return {"ok": false, "error": "Failed to start HTTP request"}
