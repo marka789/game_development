@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+platform/.env
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Godot
+client/godot/.godot/
+client/godot/.import/
+client/godot/export/
+client/godot/*.tmp
+
+# Builds
+dist/
+*.log

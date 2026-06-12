@@ -1,0 +1,169 @@
+# Getting Started (Complete Beginner Path)
+
+This repo is set up so you can build and test on a **MacBook in Cursor**, even if you have never made a game before.
+
+## What we picked for you
+
+| Piece | Choice | Why |
+|---|---|---|
+| Game client | **Godot 4** | Free, lightweight, beginner-friendly |
+| Backend | **TypeScript + Fastify** | Edited entirely in Cursor |
+| Database | **Postgres + Redis** | Standard multiplayer backend stack |
+| Testing | **Your Mac, localhost** | Two clients later; one client for now |
+
+You are **not** building Minecraft-style creative mode. This is a social hub + co-op hunt slice.
+
+---
+
+## One-time Mac setup
+
+Install these once:
+
+1. **Godot 4.3+** — https://godotengine.org/download
+2. **Node.js 20+** — https://nodejs.org
+3. **Docker Desktop** — https://www.docker.com/products/docker-desktop/
+4. **Cursor** — you already have this
+
+Optional later: Git (usually preinstalled on Mac).
+
+---
+
+## Day 1: run the project (about 15 minutes)
+
+### 1. Clone/open this repo in Cursor
+
+```bash
+cd /path/to/game_development
+```
+
+### 2. Start the backend
+
+```bash
+chmod +x scripts/*.sh
+./scripts/dev-up.sh
+```
+
+This starts Postgres + Redis, installs npm packages, runs migrations, and creates test users.
+
+### 3. Start the API (keep this terminal open)
+
+```bash
+cd platform
+npm run dev
+```
+
+You should see: `Platform API running at http://localhost:3000`
+
+### 4. Smoke-test the API (optional)
+
+In a new terminal:
+
+```bash
+./scripts/test-api.sh
+```
+
+### 5. Open the game client
+
+1. Open **Godot**
+2. Import project → select `client/godot/project.godot`
+3. Press **Play** (F5)
+4. Login with:
+   - Username: `alice`
+   - Password: `test1234`
+
+You should land in a simple 3D hub placeholder.
+
+---
+
+## How you will work week to week
+
+```text
+Cursor (most days)          Godot (some days)
+──────────────────          ─────────────────
+platform/ API code          scenes + movement
+scripts/                    animations
+docs/                       playtesting
+```
+
+Rule of thumb:
+
+- **Cursor** → accounts, friends, party, loot, servers, Docker
+- **Godot** → walking around, combat, UI screens, boss fights
+
+---
+
+## Testing on one MacBook
+
+### Right now (Week 1–4)
+
+- One Godot window
+- Login → hub
+- API running locally
+
+### Soon (Week 5+)
+
+- **Editor + exported build** = two players on one Mac
+- `alice` in one window, `bob` in another
+
+### Before friend playtests (Week 11–12)
+
+- Deploy API to a small cloud server
+- Send friends a Mac `.app` build
+
+---
+
+## Test accounts
+
+| Username | Password |
+|---|---|
+| alice | test1234 |
+| bob | test1234 |
+| carol | test1234 |
+| dave | test1234 |
+
+---
+
+## Project layout
+
+```text
+client/godot/     # Game you play (Godot)
+platform/         # Backend API (TypeScript)
+deploy/           # Docker services
+scripts/          # dev-up, test helpers
+docs/             # architecture + guides
+```
+
+---
+
+## Common problems
+
+### `docker: command not found`
+
+Install Docker Desktop and reopen Terminal.
+
+### Godot login fails
+
+1. Is `npm run dev` running in `platform/`?
+2. Run `./scripts/test-api.sh`
+3. Check Godot points to `http://127.0.0.1:3000` (default in `api_client.gd`)
+
+### Database connection error
+
+```bash
+./scripts/dev-down.sh
+./scripts/dev-up.sh
+```
+
+---
+
+## What gets built next
+
+Follow the 12-week vertical slice plan in `docs/ARCHITECTURE.md`:
+
+1. Week 1–2: movement + two players see each other
+2. Week 3–4: login (done in scaffold) + join hub token
+3. Week 5–6: friends + party
+4. Week 7–8: hunt instance + boss
+5. Week 9–12: loot, polish, friend playtest
+
+You do not need to plan everything upfront. Each week ends with a 5-minute playtest on your Mac.
