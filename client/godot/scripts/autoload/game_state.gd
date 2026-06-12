@@ -5,6 +5,7 @@ extends Node
 signal profile_loaded(profile: Dictionary)
 
 var profile: Dictionary = {}
+var hub_join_info: Dictionary = {}
 
 
 func load_profile() -> Dictionary:

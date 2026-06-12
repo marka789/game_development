@@ -19,8 +19,11 @@ Inspired by social hangout games + co-op hunts + light RPG progression — **wit
 chmod +x scripts/*.sh
 ./scripts/dev-up.sh
 
-# new terminal
+# terminal 2
 cd platform && npm run dev
+
+# terminal 3
+./scripts/run-hub-server.sh
 
 # Godot: open client/godot/project.godot and press Play
 # login: alice / test1234
@@ -46,7 +49,7 @@ Scaffold only — Week 0:
 
 - [x] Platform API with auth, friends, party, hunt reward stubs
 - [x] Dockerized Postgres + Redis
-- [x] Godot login screen → placeholder hub
-- [ ] Multiplayer movement in hub (Week 2)
+- [x] Godot login screen → join hub flow
+- [x] Multiplayer movement in hub (ENet + dedicated hub server)
 - [ ] Friends/party UI in client (Week 5–6)
 - [ ] Hunt instance + boss (Week 7–8)

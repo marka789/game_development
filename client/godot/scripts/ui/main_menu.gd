@@ -32,6 +32,8 @@ func _on_login_pressed() -> void:
 		_set_status(profile_result.error)
 		return
 
+	if not await _enter_hub():
+		return
 	get_tree().change_scene_to_file("res://scenes/hub.tscn")
 
 
@@ -45,4 +47,26 @@ func _on_register_pressed() -> void:
 
 	_set_status("Account created. Loading hub...")
 	await GameState.load_profile()
+	if not await _enter_hub():
+		return
 	get_tree().change_scene_to_file("res://scenes/hub.tscn")
+
+
+func _enter_hub() -> bool:
+	_set_status("Joining hub...")
+	var join_result := await ApiClient.join_hub()
+	if not join_result.ok:
+		_set_status(join_result.error)
+		return false
+
+	GameState.hub_join_info = join_result.data
+	var connect_result := await HubNetwork.connect_as_client(
+		str(join_result.data.get("hubHost", "127.0.0.1")),
+		int(join_result.data.get("hubPort", 7777)),
+		str(join_result.data.get("joinToken", ""))
+	)
+	if not connect_result.ok:
+		_set_status(connect_result.error)
+		return false
+
+	return true

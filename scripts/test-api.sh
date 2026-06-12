@@ -17,7 +17,15 @@ curl -fsS "$API_URL/me" -H "Authorization: Bearer $TOKEN"
 echo ""
 
 echo "Join hub..."
-curl -fsS -X POST "$API_URL/world/join-hub" -H "Authorization: Bearer $TOKEN"
+JOIN_JSON=$(curl -fsS -X POST "$API_URL/world/join-hub" -H "Authorization: Bearer $TOKEN")
+echo "$JOIN_JSON"
+JOIN_TOKEN=$(echo "$JOIN_JSON" | node -e "process.stdin.on('data',d=>console.log(JSON.parse(d).joinToken))")
+echo ""
+
+echo "Validate hub join token..."
+curl -fsS -X POST "$API_URL/world/validate-hub-join" \
+  -H 'Content-Type: application/json' \
+  -d "{\"joinToken\":\"$JOIN_TOKEN\"}"
 echo ""
 
 echo "API smoke test passed."

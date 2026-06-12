@@ -16,6 +16,7 @@ config/icon="res://icon.svg"
 
 ApiClient="*res://scripts/autoload/api_client.gd"
 GameState="*res://scripts/autoload/game_state.gd"
+HubNetwork="*res://scripts/autoload/hub_network.gd"
 
 [display]
 

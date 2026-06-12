@@ -62,7 +62,15 @@ In a new terminal:
 ./scripts/test-api.sh
 ```
 
-### 5. Open the game client
+### 5. Start the hub server (new terminal)
+
+```bash
+./scripts/run-hub-server.sh
+```
+
+Leave this running. It listens on port `7777` for players.
+
+### 6. Open the game client
 
 1. Open **Godot**
 2. Import project → select `client/godot/project.godot`
@@ -71,7 +79,16 @@ In a new terminal:
    - Username: `alice`
    - Password: `test1234`
 
-You should land in a simple 3D hub placeholder.
+You should land in the 3D hub as a capsule avatar. Use **WASD** to move.
+
+### 7. Test with a second player (same Mac)
+
+1. In Godot: **Project → Export → Add → macOS** (one-time setup)
+2. Export a debug build (or run a second Godot editor instance if you prefer)
+3. Keep hub server + API running
+4. Login as `bob` / `test1234` in the second client
+
+You should see **both players** in the same hub, moving independently.
 
 ---
 
@@ -94,16 +111,11 @@ Rule of thumb:
 
 ## Testing on one MacBook
 
-### Right now (Week 1–4)
+### Right now (Week 2)
 
-- One Godot window
-- Login → hub
-- API running locally
-
-### Soon (Week 5+)
-
-- **Editor + exported build** = two players on one Mac
-- `alice` in one window, `bob` in another
+- Hub server + API + one or two Godot clients
+- Login → hub → see other players move
+- `alice` in one window, `bob` in another (editor + export build)
 
 ### Before friend playtests (Week 11–12)
 
@@ -146,6 +158,12 @@ Install Docker Desktop and reopen Terminal.
 1. Is `npm run dev` running in `platform/`?
 2. Run `./scripts/test-api.sh`
 3. Check Godot points to `http://127.0.0.1:3000` (default in `api_client.gd`)
+
+### "Timed out connecting to hub"
+
+1. Start the hub server: `./scripts/run-hub-server.sh`
+2. Confirm port `7777` is not blocked
+3. Restart hub server after API restarts
 
 ### Database connection error
 

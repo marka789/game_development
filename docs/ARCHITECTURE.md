@@ -44,7 +44,8 @@ Godot Hunt Server :7800       (Week 7+)
 | `POST /party/invite` | Invite by username |
 | `POST /party/leave` | Leave party |
 | `POST /party/ready` | Ready toggle |
-| `POST /world/join-hub` | Hub connection info |
+| `POST /world/join-hub` | Hub connection info + join token |
+| `POST /world/validate-hub-join` | Hub server validates join tokens |
 | `POST /party/start-hunt` | Start hunt instance |
 | `POST /hunt/complete` | Grant XP + loot |
 
