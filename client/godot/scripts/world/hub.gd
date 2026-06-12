@@ -11,7 +11,7 @@ const SPAWN_POINTS := [
 @onready var status_label: Label = %StatusLabel
 @onready var net_label: Label = %NetLabel
 @onready var players_root: Node3D = %Players
-@onready var spawner: MultiplayerSpawner = %MultiplayerSpawner
+@onready var fallback_camera: Camera3D = %FallbackCamera
 
 var _spawn_index := 0
 var _players_by_peer: Dictionary = {}
@@ -19,10 +19,10 @@ var _players_by_peer: Dictionary = {}
 
 func _ready() -> void:
 	_ensure_ground()
-	spawner.spawn_function = _spawn_player
 
 	HubNetwork.peer_authenticated.connect(_on_peer_authenticated)
 	HubNetwork.peer_disconnected.connect(_on_peer_disconnected)
+	HubNetwork.authentication_failed.connect(_on_authentication_failed)
 
 	players_root.child_entered_tree.connect(func(_child: Node) -> void: _update_net_info())
 	players_root.child_exiting_tree.connect(func(_child: Node) -> void: _update_net_info())
@@ -41,27 +41,44 @@ func _ready() -> void:
 		_set_status("Not connected to hub server")
 		return
 
-	_set_status("Welcome, %s" % GameState.profile.get("display_name", "Hunter"))
-	HubNetwork.register_with_server()
+	if fallback_camera:
+		fallback_camera.current = true
+
+	var display_name := str(GameState.profile.get("display_name", "Hunter"))
+	_set_status("Welcome, %s — spawning avatar..." % display_name)
 	_update_net_info()
 
-
-func _spawn_player(profile: Dictionary) -> Node:
-	var player: CharacterBody3D = PLAYER_SCENE.instantiate()
-	player.configure(profile)
-	return player
+	await get_tree().process_frame
+	await get_tree().process_frame
+	HubNetwork.register_with_server()
+	_wait_for_local_player(display_name)
 
 
 func _on_peer_authenticated(peer_id: int, profile: Dictionary) -> void:
 	if not multiplayer.is_server():
 		return
 
-	var player: CharacterBody3D = spawner.spawn(profile)
+	var spawn_pos := _next_spawn_point()
+	spawn_player_rpc.rpc(profile, peer_id, spawn_pos)
+
+
+@rpc("authority", "call_local", "reliable")
+func spawn_player_rpc(profile: Dictionary, peer_id: int, spawn_pos: Vector3) -> void:
+	if _players_by_peer.has(peer_id):
+		return
+
+	var player: CharacterBody3D = PLAYER_SCENE.instantiate()
+	player.configure(profile)
 	player.name = str(peer_id)
 	player.set_multiplayer_authority(peer_id)
-	player.global_position = _next_spawn_point()
+	player.global_position = spawn_pos
+	players_root.add_child(player, true)
 	_players_by_peer[peer_id] = player
 	_update_net_info()
+
+	if player.is_multiplayer_authority():
+		_disable_fallback_camera()
+		_set_status("Welcome, %s" % profile.get("displayName", "Hunter"))
 
 
 func _on_peer_disconnected(peer_id: int) -> void:
@@ -71,6 +88,28 @@ func _on_peer_disconnected(peer_id: int) -> void:
 			player.queue_free()
 		_players_by_peer.erase(peer_id)
 	_update_net_info()
+
+
+func _on_authentication_failed(reason: String) -> void:
+	_set_status("Hub auth failed: %s" % reason)
+
+
+func _wait_for_local_player(display_name: String) -> void:
+	for _attempt in range(50):
+		for child in players_root.get_children():
+			var player := child as CharacterBody3D
+			if player and player.is_multiplayer_authority():
+				_disable_fallback_camera()
+				_set_status("Welcome, %s" % display_name)
+				return
+		await get_tree().create_timer(0.1).timeout
+
+	_set_status("Avatar did not spawn. Check Terminal 3 (hub server) and Terminal 2 (API).")
+
+
+func _disable_fallback_camera() -> void:
+	if fallback_camera:
+		fallback_camera.current = false
 
 
 func _next_spawn_point() -> Vector3:
@@ -95,9 +134,9 @@ func _set_status(text: String) -> void:
 
 
 func _update_net_info() -> void:
-	var peer_count := _players_by_peer.size()
+	var player_count := players_root.get_child_count()
 	if HubNetwork.is_hub_server:
-		net_label.text = "Server | players: %s | WASD to move" % peer_count
+		net_label.text = "Server | players: %s | WASD to move" % player_count
 	else:
 		var my_id := multiplayer.get_unique_id()
-		net_label.text = "Client #%s | online: %s | WASD to move" % [my_id, max(peer_count, players_root.get_child_count())]
+		net_label.text = "Client #%s | players: %s | WASD to move" % [my_id, player_count]

@@ -50,8 +50,11 @@ func _request(method: int, path: String, body: Dictionary = {}) -> Dictionary:
 
 	if response_code >= 400:
 		var message := "Request failed (%s)" % response_code
-		if typeof(parsed) == TYPE_DICTIONARY and parsed.has("error"):
-			message = str(parsed["error"])
+		if typeof(parsed) == TYPE_DICTIONARY:
+			if parsed.has("message"):
+				message = str(parsed["message"])
+			elif parsed.has("error"):
+				message = str(parsed["error"])
 		return {"ok": false, "error": message, "status": response_code}
 
 	if typeof(parsed) != TYPE_DICTIONARY:

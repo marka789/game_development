@@ -4,7 +4,7 @@ extends Node
 
 signal peer_authenticated(peer_id: int, profile: Dictionary)
 signal peer_disconnected(peer_id: int)
-signal connection_ready()
+signal authentication_failed(reason: String)
 
 const DEFAULT_HUB_PORT := 7777
 
@@ -64,6 +64,9 @@ func disconnect_from_hub() -> void:
 func register_with_server() -> void:
 	if is_hub_server:
 		return
+	if join_token.is_empty():
+		authentication_failed.emit("Missing hub join token")
+		return
 	submit_join_token.rpc_id(1, join_token)
 
 
@@ -90,7 +93,11 @@ func validate_join_token(token: String) -> Dictionary:
 	var parsed: Variant = JSON.parse_string(response_body)
 
 	if response_code >= 400 or typeof(parsed) != TYPE_DICTIONARY:
-		return {"ok": false, "error": "Join token rejected by platform API"}
+		var message := "Join token rejected (HTTP %s)" % response_code
+		if typeof(parsed) == TYPE_DICTIONARY and parsed.has("message"):
+			message = str(parsed["message"])
+		print("Hub auth failed: %s | body=%s" % [message, response_body])
+		return {"ok": false, "error": message}
 
 	return {"ok": true, "data": parsed}
 
@@ -106,11 +113,18 @@ func _authenticate_peer(peer_id: int, token: String) -> void:
 	var validation := await validate_join_token(token)
 	if not validation.ok:
 		push_warning("Rejected peer %s: %s" % [peer_id, validation.error])
+		auth_failed.rpc_id(peer_id, validation.error)
 		multiplayer.disconnect_peer(peer_id)
 		return
 
+	print("Hub authenticated peer %s as %s" % [peer_id, validation.data.get("displayName", "?")])
 	connected_peers[peer_id] = validation.data
 	peer_authenticated.emit(peer_id, validation.data)
+
+
+@rpc("authority", "call_remote", "reliable")
+func auth_failed(reason: String) -> void:
+	authentication_failed.emit(reason)
 
 
 func _on_peer_connected(peer_id: int) -> void:
