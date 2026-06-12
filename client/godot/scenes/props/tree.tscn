@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://proptree001"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_trunk"]
+top_radius = 0.25
+bottom_radius = 0.35
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_trunk"]
+albedo_color = Color(0.427451, 0.298039, 0.184314, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_leaves"]
+radius = 1.2
+height = 2.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_leaves"]
+albedo_color = Color(0.247059, 0.560784, 0.290196, 1)
+
+[node name="Tree" type="Node3D"]
+
+[node name="Trunk" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("CylinderMesh_trunk")
+surface_material_override/0 = SubResource("StandardMaterial3D_trunk")
+
+[node name="Leaves" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
+mesh = SubResource("SphereMesh_leaves")
+surface_material_override/0 = SubResource("StandardMaterial3D_leaves")
