@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 @export var player_name := "Hunter"
+@export var username := ""
 @export var skin_color := Color.from_string("#6EC6FF", Color.CYAN)
 
 const MOVE_SPEED := 6.0
@@ -20,8 +21,14 @@ func _ready() -> void:
 
 func configure(profile: Dictionary) -> void:
 	player_name = str(profile.get("displayName", profile.get("display_name", "Hunter")))
+	username = str(profile.get("username", ""))
 	skin_color = Color.from_string(str(profile.get("skinColor", profile.get("skin_color", "#6EC6FF"))), Color.CYAN)
 	_apply_visuals()
+
+
+func set_party_highlight(active: bool) -> void:
+	if name_label:
+		name_label.modulate = Color(1.0, 0.85, 0.2) if active else Color.WHITE
 
 
 func _apply_visuals() -> void:

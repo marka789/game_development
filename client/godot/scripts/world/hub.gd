@@ -12,9 +12,11 @@ const SPAWN_POINTS := [
 @onready var net_label: Label = %NetLabel
 @onready var players_root: Node3D = %Players
 @onready var fallback_camera: Camera3D = %FallbackCamera
+@onready var social_panel: PanelContainer = %SocialPanel
 
 var _spawn_index := 0
 var _players_by_peer: Dictionary = {}
+var _party_usernames: Array[String] = []
 
 
 func _ready() -> void:
@@ -23,6 +25,8 @@ func _ready() -> void:
 	HubNetwork.peer_authenticated.connect(_on_peer_authenticated)
 	HubNetwork.peer_disconnected.connect(_on_peer_disconnected)
 	HubNetwork.authentication_failed.connect(_on_authentication_failed)
+	if social_panel:
+		social_panel.party_updated.connect(_on_party_updated)
 
 	players_root.child_entered_tree.connect(func(_child: Node) -> void: _update_net_info())
 	players_root.child_exiting_tree.connect(func(_child: Node) -> void: _update_net_info())
@@ -74,6 +78,8 @@ func spawn_player_rpc(profile: Dictionary, peer_id: int, spawn_pos: Vector3) -> 
 	player.global_position = spawn_pos
 	players_root.add_child(player, true)
 	_players_by_peer[peer_id] = player
+	if player.has_method("set_party_highlight"):
+		player.set_party_highlight(player.username in _party_usernames)
 	_update_net_info()
 
 	if player.is_multiplayer_authority():
@@ -133,10 +139,28 @@ func _set_status(text: String) -> void:
 	status_label.text = text
 
 
+func _on_party_updated(party: Dictionary) -> void:
+	_party_usernames.clear()
+	if party.is_empty():
+		_apply_party_highlights()
+		return
+	for member in party.get("members", []):
+		_party_usernames.append(str(member.get("username", "")))
+	_apply_party_highlights()
+
+
+func _apply_party_highlights() -> void:
+	for child in players_root.get_children():
+		var player := child as CharacterBody3D
+		if player and player.has_method("set_party_highlight"):
+			var in_party := player.username in _party_usernames
+			player.set_party_highlight(in_party)
+
+
 func _update_net_info() -> void:
 	var player_count := players_root.get_child_count()
 	if HubNetwork.is_hub_server:
-		net_label.text = "Server | players: %s | WASD to move" % player_count
+		net_label.text = "Server | players: %s | WASD to move | Tab = social" % player_count
 	else:
 		var my_id := multiplayer.get_unique_id()
-		net_label.text = "Client #%s | players: %s | WASD to move" % [my_id, player_count]
+		net_label.text = "Client #%s | players: %s | WASD | Tab = social" % [my_id, player_count]

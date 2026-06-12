@@ -90,6 +90,14 @@ You should land in the 3D hub as a capsule avatar. Use **WASD** to move.
 
 You should see **both players** in the same hub, moving independently.
 
+### 8. Social panel (friends + party)
+
+Press **Tab** in the hub to open the social panel on the right:
+
+- **Friends** — see who's online, add friends, accept requests
+- **Party** — create a party, invite a friend, toggle **Ready**
+- Alice and Bob are pre-friended if you ran `./scripts/dev-up.sh` (re-run `cd platform && npm run db:seed` to refresh)
+
 ---
 
 ## How you will work week to week

@@ -9,6 +9,35 @@ const TEST_USERS = [
   { username: "dave", password: "test1234", displayName: "Dave", skin: "#B39DDB" },
 ];
 
+async function seedFriendship(usernameA: string, usernameB: string): Promise<void> {
+  const users = await pool.query(
+    `
+    SELECT u.username, u.id
+    FROM users u
+    WHERE u.username = ANY($1::text[])
+    `,
+    [[usernameA, usernameB]],
+  );
+  const byName = new Map(
+    users.rows.map((row) => [row.username as string, row.id as string]),
+  );
+  const idA = byName.get(usernameA);
+  const idB = byName.get(usernameB);
+  if (!idA || !idB) {
+    return;
+  }
+
+  await pool.query(
+    `
+    INSERT INTO friendships (requester_id, addressee_id, status)
+    VALUES ($1, $2, 'accepted')
+    ON CONFLICT (requester_id, addressee_id) DO NOTHING
+    `,
+    [idA, idB],
+  );
+  console.log(`Seeded friendship: ${usernameA} <-> ${usernameB}`);
+}
+
 async function seed(): Promise<void> {
   await runMigrations();
 
@@ -40,6 +69,8 @@ async function seed(): Promise<void> {
     );
     console.log(`Seeded user: ${user.username} / ${user.password}`);
   }
+
+  await seedFriendship("alice", "bob");
 }
 
 seed()

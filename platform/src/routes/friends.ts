@@ -22,7 +22,11 @@ export async function friendsRoutes(app: FastifyInstance): Promise<void> {
           WHEN f.requester_id = $1 THEN u2.username
           ELSE u1.username
         END AS username,
-        f.status
+        f.status,
+        CASE
+          WHEN f.requester_id = $1 THEN 'outgoing'
+          ELSE 'incoming'
+        END AS direction
       FROM friendships f
       JOIN users u1 ON u1.id = f.requester_id
       JOIN users u2 ON u2.id = f.addressee_id

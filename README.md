@@ -51,5 +51,5 @@ Scaffold only — Week 0:
 - [x] Dockerized Postgres + Redis
 - [x] Godot login screen → join hub flow
 - [x] Multiplayer movement in hub (ENet + dedicated hub server)
-- [ ] Friends/party UI in client (Week 5–6)
+- [x] Friends + party UI in hub (Tab to open social panel)
 - [ ] Hunt instance + boss (Week 7–8)

@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://hubscene001"]
+[gd_scene load_steps=4 format=3 uid="uid://hubscene001"]
 
 [ext_resource type="Script" path="res://scripts/world/hub.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://hubsocialpanel001" path="res://scenes/ui/hub_social_panel.tscn" id="2"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(40, 0.2, 40)
@@ -44,4 +45,6 @@ offset_left = 16.0
 offset_top = 52.0
 offset_right = 760.0
 offset_bottom = 84.0
-text = "Net info"
+text = "Net info | Tab = social panel"
+
+[node name="SocialPanel" parent="UI" instance=ExtResource("2")]

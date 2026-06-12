@@ -106,3 +106,23 @@ func invite_to_party(username: String) -> Dictionary:
 
 func start_hunt() -> Dictionary:
 	return await _request(HTTPClient.METHOD_POST, "/party/start-hunt")
+
+
+func fetch_friends() -> Dictionary:
+	return await _request(HTTPClient.METHOD_GET, "/friends")
+
+
+func request_friend(username: String) -> Dictionary:
+	return await _request(HTTPClient.METHOD_POST, "/friends/request", {"username": username})
+
+
+func accept_friend(username: String) -> Dictionary:
+	return await _request(HTTPClient.METHOD_POST, "/friends/accept", {"username": username})
+
+
+func leave_party() -> Dictionary:
+	return await _request(HTTPClient.METHOD_POST, "/party/leave")
+
+
+func set_party_ready(ready: bool) -> Dictionary:
+	return await _request(HTTPClient.METHOD_POST, "/party/ready", {"ready": ready})
