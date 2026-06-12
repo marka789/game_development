@@ -52,4 +52,5 @@ Scaffold only — Week 0:
 - [x] Godot login screen → join hub flow
 - [x] Multiplayer movement in hub (ENet + dedicated hub server)
 - [x] Friends + party UI in hub (Tab to open social panel)
+- [x] Basic hub graphics (sky, trees, rocks, plaza, hunt board, lantern lights)
 - [ ] Hunt instance + boss (Week 7–8)

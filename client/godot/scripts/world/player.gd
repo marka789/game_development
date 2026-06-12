@@ -6,7 +6,8 @@ extends CharacterBody3D
 
 const MOVE_SPEED := 6.0
 
-@onready var mesh: MeshInstance3D = $MeshInstance3D
+@onready var body_mesh: MeshInstance3D = %Body
+@onready var head_mesh: MeshInstance3D = %Head
 @onready var name_label: Label3D = $NameLabel
 
 
@@ -34,10 +35,16 @@ func set_party_highlight(active: bool) -> void:
 func _apply_visuals() -> void:
 	if name_label:
 		name_label.text = player_name
-	if mesh:
-		var material := StandardMaterial3D.new()
-		material.albedo_color = skin_color
-		mesh.material_override = material
+	if body_mesh:
+		var body_material := StandardMaterial3D.new()
+		body_material.albedo_color = skin_color
+		body_material.roughness = 0.7
+		body_mesh.material_override = body_material
+	if head_mesh:
+		var head_material := StandardMaterial3D.new()
+		head_material.albedo_color = skin_color.lightened(0.25)
+		head_material.roughness = 0.55
+		head_mesh.material_override = head_material
 
 
 func _setup_local_camera() -> void:

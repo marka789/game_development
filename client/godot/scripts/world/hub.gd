@@ -20,7 +20,7 @@ var _party_usernames: Array[String] = []
 
 
 func _ready() -> void:
-	_ensure_ground()
+	_setup_visuals()
 
 	HubNetwork.peer_authenticated.connect(_on_peer_authenticated)
 	HubNetwork.peer_disconnected.connect(_on_peer_disconnected)
@@ -124,15 +124,21 @@ func _next_spawn_point() -> Vector3:
 	return point
 
 
+func _setup_visuals() -> void:
+	var is_headless_server := OS.get_cmdline_user_args().has("--hub-server")
+	if not is_headless_server:
+		HubVisuals.setup_world_environment(self)
+		HubVisuals.populate_decorations(self)
+	_ensure_ground()
+
+
 func _ensure_ground() -> void:
 	var mesh_instance := get_node_or_null("Ground/MeshInstance3D") as MeshInstance3D
 	if mesh_instance and mesh_instance.mesh == null:
 		var plane := PlaneMesh.new()
 		plane.size = Vector2(40, 40)
 		mesh_instance.mesh = plane
-		var material := StandardMaterial3D.new()
-		material.albedo_color = Color("#3D5A4A")
-		mesh_instance.material_override = material
+		mesh_instance.material_override = HubVisuals.create_ground_material()
 
 
 func _set_status(text: String) -> void:
