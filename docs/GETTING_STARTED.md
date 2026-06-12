@@ -151,7 +151,27 @@ docs/             # architecture + guides
 
 ### `docker: command not found`
 
-Install Docker Desktop and reopen Terminal.
+Docker Desktop can be open while Terminal still cannot find `docker`. Try in order:
+
+**A. Test Docker directly (paste in Terminal):**
+```bash
+/Applications/Docker.app/Contents/Resources/bin/docker --version
+```
+
+If that works, add this line to `~/.zshrc` (then run `source ~/.zshrc`):
+```bash
+export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
+```
+
+**B. Enable CLI in Docker Desktop:**
+1. Open **Docker Desktop**
+2. **Settings** (gear icon) → **General**
+3. Look for options about command line tools / symlinks / PATH
+4. Quit Docker Desktop fully, reopen it, open a **new** terminal
+
+**C. Pull latest repo** — `scripts/dev-up.sh` now auto-detects Docker inside `Docker.app`.
+
+**D. Still stuck?** In Docker Desktop → **Troubleshoot** → **Reset to factory defaults** (last resort).
 
 ### Godot login fails
 
