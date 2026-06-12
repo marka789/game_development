@@ -1,4 +1,3 @@
-class_name HubVisuals
 extends RefCounted
 
 ## Builds simple 3D props without external art files.

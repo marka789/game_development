@@ -200,6 +200,18 @@ export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
 ./scripts/dev-up.sh
 ```
 
+### Pulled new code but graphics look the same
+
+1. Confirm you pulled the **same folder** Godot opened:
+   ```bash
+   cd /path/to/game_development
+   git log -1 --oneline
+   ```
+2. **Quit Godot completely** (Cmd+Q), then reopen `client/godot/project.godot`.
+3. After login, look for: **`Build: hub-art-v1 (blue sky + trees)`** in the top-left.
+4. If that text is missing, Godot is still using an old project copy.
+5. Check Godot's **Output** panel (bottom) for red errors when you press F5.
+
 ---
 
 ## What gets built next

@@ -126,10 +126,15 @@ func _next_spawn_point() -> Vector3:
 
 func _setup_visuals() -> void:
 	var is_headless_server := OS.get_cmdline_user_args().has("--hub-server")
-	if not is_headless_server:
-		HubVisuals.setup_world_environment(self)
-		HubVisuals.populate_decorations(self)
+	if is_headless_server:
+		_ensure_ground()
+		return
+
+	# Sky + a few trees are baked into hub.tscn; this adds the rest at runtime.
+	HubVisuals.setup_world_environment(self)
+	HubVisuals.populate_decorations(self)
 	_ensure_ground()
+	print("Hub visuals loaded (hub-art-v1)")
 
 
 func _ensure_ground() -> void:
