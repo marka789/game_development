@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { pool } from "../db/pool.js";
 import { requireAuth } from "../middleware/auth.js";
+import { createHuntJoinToken } from "../services/hunt-tokens.js";
 
 async function getPartyForUser(userId: string) {
   const result = await pool.query(
@@ -36,14 +37,47 @@ async function getPartyMembers(partyId: string) {
   return result.rows;
 }
 
+async function buildHuntConnection(
+  party: { id: string; hunt_session_id: string | null; status: string },
+  userId: string,
+) {
+  if (party.status !== "in_hunt" || !party.hunt_session_id) {
+    return null;
+  }
+
+  const session = await pool.query(
+    `
+    SELECT instance_host, instance_port, status
+    FROM hunt_sessions
+    WHERE id = $1
+    `,
+    [party.hunt_session_id],
+  );
+  const hunt = session.rows[0] as
+    | { instance_host: string; instance_port: number; status: string }
+    | undefined;
+  if (!hunt || hunt.status !== "active") {
+    return null;
+  }
+
+  return {
+    huntSessionId: party.hunt_session_id,
+    huntHost: hunt.instance_host,
+    huntPort: hunt.instance_port,
+    joinToken: createHuntJoinToken(party.hunt_session_id, party.id, userId),
+  };
+}
+
 export async function partyRoutes(app: FastifyInstance): Promise<void> {
   app.get("/party", { preHandler: requireAuth }, async (request, reply) => {
-    const party = await getPartyForUser(request.authUser!.userId);
+    const userId = request.authUser!.userId;
+    const party = await getPartyForUser(userId);
     if (!party) {
-      return { party: null };
+      return { party: null, huntConnection: null };
     }
     const members = await getPartyMembers(party.id);
-    return { party: { ...party, members } };
+    const huntConnection = await buildHuntConnection(party, userId);
+    return { party: { ...party, members }, huntConnection };
   });
 
   app.post("/party/create", { preHandler: requireAuth }, async (request, reply) => {

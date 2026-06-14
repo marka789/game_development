@@ -126,3 +126,10 @@ func leave_party() -> Dictionary:
 
 func set_party_ready(ready: bool) -> Dictionary:
 	return await _request(HTTPClient.METHOD_POST, "/party/ready", {"ready": ready})
+
+
+func complete_hunt(hunt_session_id: String, success: bool) -> Dictionary:
+	return await _request(HTTPClient.METHOD_POST, "/hunt/complete", {
+		"huntSessionId": hunt_session_id,
+		"success": success,
+	})
