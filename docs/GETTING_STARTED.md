@@ -81,7 +81,7 @@ Leave this running. It listens on port `7777` for players.
 
 You should land in the 3D hub as a capsule avatar. Use **WASD** to move.
 
-### 7. Test with a second player (same Mac)
+### 8. Test with a second player (same Mac)
 
 1. In Godot: **Project → Export → Add → macOS** (one-time setup)
 2. Export a debug build (or run a second Godot editor instance if you prefer)
@@ -90,13 +90,15 @@ You should land in the 3D hub as a capsule avatar. Use **WASD** to move.
 
 You should see **both players** in the same hub, moving independently.
 
-### 8. Social panel (friends + party)
+### 8. Co-op hunt (party required)
 
-Press **Tab** in the hub to open the social panel on the right:
+1. Press **Tab** → create a party → invite a friend (or test solo)
+2. Everyone toggles **Ready**
+3. Party leader clicks **Start Hunt**
+4. In the arena: **WASD** move, **Space** attack the red boss
+5. After victory you return to hub with **XP + loot**
 
-- **Friends** — see who's online, add friends, accept requests
-- **Party** — create a party, invite a friend, toggle **Ready**
-- Alice and Bob are pre-friended if you ran `./scripts/dev-up.sh` (re-run `cd platform && npm run db:seed` to refresh)
+Requires **four** terminals: API, hub server, hunt server, Godot.
 
 ---
 

@@ -17,6 +17,7 @@ const SPAWN_POINTS := [
 var _spawn_index := 0
 var _players_by_peer: Dictionary = {}
 var _party_usernames: Array[String] = []
+var _checking_hunt := false
 
 
 func _ready() -> void:
@@ -55,7 +56,54 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	HubNetwork.register_with_server()
-	_wait_for_local_player(display_name)
+	await _wait_for_local_player(display_name)
+	_show_post_hunt_message()
+	_start_hunt_poll()
+
+
+func _show_post_hunt_message() -> void:
+	if GameState.last_hunt_rewards.is_empty():
+		return
+	var rewards := GameState.last_hunt_rewards
+	var loot := str(rewards.get("lootItemId", ""))
+	var loot_text := " | Loot: %s" % loot if loot != "" and loot != "null" else ""
+	_set_status("Back from hunt! +%s XP%s" % [str(rewards.get("xpGained", 0)), loot_text])
+	GameState.last_hunt_rewards = {}
+
+
+func _start_hunt_poll() -> void:
+	var timer := Timer.new()
+	timer.wait_time = 2.0
+	timer.autostart = true
+	timer.timeout.connect(_poll_for_hunt_start)
+	add_child(timer)
+
+
+func _poll_for_hunt_start() -> void:
+	if _checking_hunt or GameState.is_transitioning():
+		return
+	_checking_hunt = true
+	var result := await ApiClient.fetch_party()
+	_checking_hunt = false
+	if not result.ok:
+		return
+
+	var party: Variant = result.data.get("party")
+	if typeof(party) != TYPE_DICTIONARY:
+		return
+	if str(party.get("status", "")) != "in_hunt":
+		return
+
+	var connection: Variant = result.data.get("huntConnection")
+	if typeof(connection) != TYPE_DICTIONARY:
+		return
+
+	_set_status("Party hunt started — joining...")
+	var enter_result := await GameState.enter_hunt(connection)
+	if enter_result.ok:
+		get_tree().change_scene_to_file("res://scenes/hunt/hunt.tscn")
+	else:
+		_set_status(enter_result.error)
 
 
 func _on_peer_authenticated(peer_id: int, profile: Dictionary) -> void:

@@ -211,4 +211,16 @@ func _on_start_hunt_pressed() -> void:
 	if not result.ok:
 		social_status.text = result.error
 		return
-	social_status.text = "Hunt session created (scene coming Week 7)."
+
+	var connection := {
+		"huntSessionId": result.data.get("huntSessionId", ""),
+		"huntHost": result.data.get("huntHost", "127.0.0.1"),
+		"huntPort": result.data.get("huntPort", 7800),
+		"joinToken": result.data.get("joinToken", ""),
+	}
+	var enter_result := await GameState.enter_hunt(connection)
+	if not enter_result.ok:
+		social_status.text = enter_result.error
+		return
+
+	get_tree().change_scene_to_file("res://scenes/hunt/hunt.tscn")
