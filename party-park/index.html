@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Party Park</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ff7a45'/%3E%3Ccircle cx='16' cy='18' r='7' fill='%23fff8e8'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/src/client/style.css" />
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+    <div id="topbar" hidden>
+      <div class="topbar-copy">
+        <strong id="level-name">Party Park</strong>
+        <span id="room-pill"></span>
+      </div>
+      <p id="hint"></p>
+      <div class="topbar-actions">
+        <button id="copy" type="button">Copy link</button>
+        <button id="start" type="button" hidden>Start</button>
+        <button id="restart" type="button" hidden>Restart</button>
+      </div>
+    </div>
+    <div id="banner" hidden></div>
+    <form id="menu" class="panel">
+      <p class="eyebrow">Co-op puzzle</p>
+      <h1>Party Park</h1>
+      <p class="lede">Open this page with a friend. One room, one little world, no download.</p>
+      <label>
+        Name
+        <input id="name" name="name" maxlength="16" autocomplete="nickname" value="Player" />
+      </label>
+      <div class="color-row" id="colors" role="radiogroup" aria-label="Color"></div>
+      <button id="create" class="primary" type="submit">Create a room</button>
+      <div class="join-row">
+        <label>
+          Room code
+          <input id="code" name="code" maxlength="4" autocapitalize="characters" spellcheck="false" />
+        </label>
+        <button id="join" type="button">Join</button>
+      </div>
+      <p id="menu-error" class="error" role="status"></p>
+    </form>
+    <section id="lobby" class="panel" hidden>
+      <p class="eyebrow">Room <span id="lobby-code"></span></p>
+      <h2>Waiting for the door</h2>
+      <ul id="player-list"></ul>
+      <p id="lobby-status"></p>
+      <div class="row">
+        <button id="lobby-copy" type="button">Copy invite link</button>
+        <button id="lobby-start" class="primary" type="button" hidden>Start level</button>
+      </div>
+    </section>
+    <script type="module" src="/src/client/main.ts"></script>
+  </body>
+</html>
