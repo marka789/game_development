@@ -1,0 +1,24 @@
+{
+  "name": "party-park",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"tsx watch src/server/index.ts\" \"vite --host\"",
+    "start": "tsx src/server/index.ts",
+    "test": "tsx --test src/server/*.test.ts",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "planck": "^1.4.2",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@types/ws": "^8.18.1",
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.4"
+  }
+}
